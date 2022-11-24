@@ -1,4 +1,4 @@
-classdef Device < handle
+classdef Device_TZH < handle
     % device is the class for constucting the whole device
     % functions includ: AddLayer, BuildDevice, CylinderPatternDevice,
     % RectanglePatternDevice,ConvDevice, ShowLayer
@@ -22,7 +22,7 @@ classdef Device < handle
     end
 
     methods
-        function Dev = Device(xydimension,idimension,PQR)
+        function Dev = Device_TZH(xydimension,idimension,PQR)
         % Purpose: Define the reflective and tranmission region of the device and period
         % Input: permeability and permittivity in reflection and transmission region, and period
         % The xydimension and idimension should be proportional
@@ -35,6 +35,14 @@ classdef Device < handle
             Dev.PQR = PQR;
         end
         
+        function AddMaterial_TZH(Dev,ER,UR,d)
+                Dev.ER=ER;
+                Dev.UR=UR;
+                Dev.length=d;
+                Dev.ilayer=ones(size(ER,3),1); % 全部都是一层
+                % Dev.material{end+1}后续只要不去build layer应该不会用到
+        
+        end
         function AddLayer(Dev,material,length,ilayer)
         % Purpose define properties of each layer for the device
             Dev.material{end+1} = material;
@@ -42,18 +50,6 @@ classdef Device < handle
             Dev.ilayer(end+1) = ilayer;
         end
         
-        % Added by TZH
-        % To handle the multi-layer material by hands
-        function AddMaterial_Mannual(Dev,ER,UR,d)
-            Dev.ER=ER;
-            Dev.UR=UR;
-            Dev.length=d;
-            Dev.ilayer=ones(size(ER,3),1); % 全部都是一层
-            % Dev.material{end+1}后续只要不去build layer应该不会用到
-    
-        end
-
-
         function AddPattern(Dev,shape,center,size,nlayer,material)
             % Purpose: add different paterns on specific layers
 

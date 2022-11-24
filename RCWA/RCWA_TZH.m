@@ -1,4 +1,4 @@
-classdef RCWA < handle
+classdef RCWA_TZH < handle
     properties(SetAccess=protected)
         ShowProcess             % show the process of the simulation
         BlurCoef = 0          % blur device to accelerate the caculation
@@ -18,7 +18,7 @@ classdef RCWA < handle
     
     properties 
         field                   % field of the simualtion
-        WhetherBuildLayer=1     % is the layer and material should be build? : If you assign the material by your self, this should be 0
+        isbuildLayer=0            % is the layer and material should be build? 
         
     end
     
@@ -34,133 +34,134 @@ classdef RCWA < handle
     end
     
     methods
-        function ObjRCWA = RCWA(referur,trnerur,ShowProcess)
-            % Purpose: Define object RCWA
+
+        function ObjRCWA_TZH = RCWA_TZH(referur,trnerur,ShowProcess)
+            % Purpose: Define object RCWA_TZH
             % Input: the number of spatial harmonics along x and y (HAS TO BE ODD NUM)
-            ObjRCWA.referur = referur;
-            ObjRCWA.trnerur = trnerur;
-            ObjRCWA.ShowProcess = ShowProcess;
+            ObjRCWA_TZH.referur = referur;
+            ObjRCWA_TZH.trnerur = trnerur;
+            ObjRCWA_TZH.ShowProcess = ShowProcess;
         end
         
-        function ObjRCWA = UseBlurEffect(ObjRCWA,BlurCoef)
+        function ObjRCWA_TZH = UseBlurEffect(ObjRCWA_TZH,BlurCoef)
             % Purpose: open the blur effect to accelerate caculation
             % Input: blur coefficient--How many times the device will be shrinked
             if numel(BlurCoef) == 1
-                ObjRCWA.BlurCoef = BlurCoef;
+                ObjRCWA_TZH.BlurCoef = BlurCoef;
             else
                 error('BlurCoef should be a single number')
             end
         end
         
-        function ObjRCWA = UseShrinkEffect(ObjRCWA,ShrinkCoef)
+        function ObjRCWA_TZH = UseShrinkEffect(ObjRCWA_TZH,ShrinkCoef)
             % Purpose: open the blur effect to accelerate caculation
             % Input: blur coefficient--How many times the device will be shrinked
             if numel(ShrinkCoef) == 1
-                ObjRCWA.ShrinkCoef = ShrinkCoef;
+                ObjRCWA_TZH.ShrinkCoef = ShrinkCoef;
             else
                 error('ShrinkCoef should be a single number')
             end            
             
         end
         
-        function ObjRCWA = Dispersion(ObjRCWA,dispersion)
+        function ObjRCWA_TZH = Dispersion(ObjRCWA_TZH,dispersion)
             % Purpose: define the dispersion of materials
-            ObjRCWA.dispersion = dispersion;
+            ObjRCWA_TZH.dispersion = dispersion;
         end
             
         
-        function ObjRCWA = ConstructField(ObjRCWA)
+        function ObjRCWA_TZH = ConstructField(ObjRCWA_TZH)
             % Purpose: start record field inside device
-            ObjRCWA.RecordField = 1;
+            ObjRCWA_TZH.RecordField = 1;
 %             % initialize field object
-%             ObjRCWA.field = 
+%             ObjRCWA_TZH.field = 
         end
         
-        function ObjRCWA = RecordDiffOrder(ObjRCWA)
+        function ObjRCWA_TZH = RecordDiffOrder(ObjRCWA_TZH)
            % Purpose: record diffrection order
-           ObjRCWA.RecordDifOrder = 1;
+           ObjRCWA_TZH.RecordDifOrder = 1;
         end
         
-        function RCWARun(ObjRCWA,source,device,field)
-            if ObjRCWA.ShowProcess == 1
-                h = waitbar(0,'1','Name','RCWA Caculating...',...
+        function RCWA_Run(ObjRCWA_TZH,source,device,field)
+            if ObjRCWA_TZH.ShowProcess == 1
+                h = waitbar(0,'1','Name','RCWA_TZH Caculating...',...
                     'CreateCancelBtn',...
                     'setappdata(gcbf,''canceling'',1)');
                 setappdata(h,'canceling',0)
             end
             
-            ObjRCWA.source = source;
-            ObjRCWA.device = device;
-            if  ObjRCWA.dispersion == 0             % deal with dispersion of the mateiral
-                if ObjRCWA.WhetherBuildLayer==1
-                BuildLayer(ObjRCWA.device);
-                BuildPattern(ObjRCWA.device);
+            ObjRCWA_TZH.source = source;
+            ObjRCWA_TZH.device = device;
+            if  ObjRCWA_TZH.dispersion == 0             % deal with dispersion of the mateiral
+                if ObjRCWA_TZH.isbuildLayer==1
+                BuildLayer(ObjRCWA_TZH.device);
+                BuildPattern(ObjRCWA_TZH.device);
                 end
-                if ObjRCWA.BlurCoef ~= 0         %open the blur effect
-                    BlurDevice(ObjRCWA.device,ObjRCWA.BlurCoef)
+                if ObjRCWA_TZH.BlurCoef ~= 0         %open the blur effect
+                    BlurDevice(ObjRCWA_TZH.device,ObjRCWA_TZH.BlurCoef)
                 end
-                if ObjRCWA.ShrinkCoef ~= 0       %open the shrink effect
-                    ShrinkDevice(ObjRCWA.device,ObjRCWA.ShrinkCoef)
+                if ObjRCWA_TZH.ShrinkCoef ~= 0       %open the shrink effect
+                    ShrinkDevice(ObjRCWA_TZH.device,ObjRCWA_TZH.ShrinkCoef)
                 end
-                ConvDevice(ObjRCWA.device);
+                ConvDevice(ObjRCWA_TZH.device);
             end
-            if ObjRCWA.RecordField == 1             % initialize Filed object to be prepared to record field
-                LayerNum = sum(ObjRCWA.device.ilayer);
-                ObjRCWA.field = field;
-                ObjRCWA.field.W_V = cell(1,LayerNum);
-                ObjRCWA.field.LAM = cell(1,LayerNum);
+            if ObjRCWA_TZH.RecordField == 1             % initialize Filed object to be prepared to record field
+                LayerNum = sum(ObjRCWA_TZH.device.ilayer);
+                ObjRCWA_TZH.field = field;
+                ObjRCWA_TZH.field.W_V = cell(1,LayerNum);
+                ObjRCWA_TZH.field.LAM = cell(1,LayerNum);
             end
             
-            if ObjRCWA.RecordDifOrder == 1             % initialize matrix to record diffrection for each order
+            if ObjRCWA_TZH.RecordDifOrder == 1             % initialize matrix to record diffrection for each order
 %                 x_k = size(device.PQR);
                 Ref_order_ = zeros(device.PQR(1),device.PQR(2),source.snum);            % record refection in each order
                 Trn_order_ = Ref_order_;            % record transmission in each order
             end
-%             if ObjRCWA.RecordField == 1             % initialize Filed object to be prepared to record field
-%                 LayerNum = sum(ObjRCWA.device.ilayer);
-%                 ObjRCWA.field = Field;
+%             if ObjRCWA_TZH.RecordField == 1             % initialize Filed object to be prepared to record field
+%                 LayerNum = sum(ObjRCWA_TZH.device.ilayer);
+%                 ObjRCWA_TZH.field = Field;
 %                 for wavenum = 1: NLAM
-%                     ObjRCWA.field(wavenum).wavenumber = wavenum;
-%                     ObjRCWA.field(wavenum).W_V = cell(1,LayerNum);
-%                     ObjRCWA.field(wavenum).LAM = cell(1,LayerNum);
+%                     ObjRCWA_TZH.field(wavenum).wavenumber = wavenum;
+%                     ObjRCWA_TZH.field(wavenum).W_V = cell(1,LayerNum);
+%                     ObjRCWA_TZH.field(wavenum).LAM = cell(1,LayerNum);
 %                 end
 %             end
             NLAM = source.snum;                  %determine how many simulations
             for nlam = 1 : NLAM
-                if ObjRCWA.dispersion == 1
-                    if ObjRCWA.WhetherBuildLayer==1
-                    BuildLayer(ObjRCWA.device,nlam);
-                    BuildPattern(ObjRCWA.device,nlam);
+                if ObjRCWA_TZH.dispersion == 1
+                    if ObjRCWA_TZH.isbuildLayer==1
+                    BuildLayer(ObjRCWA_TZH.device,nlam);
+                    BuildPattern(ObjRCWA_TZH.device,nlam);
                     end
-                    if ObjRCWA.BlurCoef ~= 0         %open the blur effect
-                        BlurDevice(ObjRCWA.device,ObjRCWA.BlurCoef)
+                    if ObjRCWA_TZH.BlurCoef ~= 0         %open the blur effect
+                        BlurDevice(ObjRCWA_TZH.device,ObjRCWA_TZH.BlurCoef)
                     end
-                    if ObjRCWA.ShrinkCoef ~= 0       %open the shrink effect
-                        ShrinkDevice(ObjRCWA.device,ObjRCWA.ShrinkCoef)
+                    if ObjRCWA_TZH.ShrinkCoef ~= 0       %open the shrink effect
+                        ShrinkDevice(ObjRCWA_TZH.device,ObjRCWA_TZH.ShrinkCoef)
                     end
-                    ConvDevice(ObjRCWA.device);
+                    ConvDevice(ObjRCWA_TZH.device);
                 end
                 % Make patterns in the layer input:[center],radius,[in which ilayer],[er, ur]
-                [Ref,Trn] = RCWAer(ObjRCWA,source,ObjRCWA.device,nlam);
-                if ObjRCWA.RecordDifOrder == 1
+                [Ref,Trn] = RCWAer(ObjRCWA_TZH,source,ObjRCWA_TZH.device,nlam);
+                if ObjRCWA_TZH.RecordDifOrder == 1
                     Ref_order_(:,:,nlam) = reshape(Ref,device.PQR);            % record refection in each order
                     Trn_order_(:,:,nlam) = reshape(Trn,device.PQR);            % record transmission in each order
                 end
                 Ref = sum(Ref(:));
                 Trn = sum(Trn(:));
-                ObjRCWA.R(nlam) = 100*Ref;
-                ObjRCWA.T(nlam) = 100*Trn;
+                ObjRCWA_TZH.R(nlam) = 100*Ref;
+                ObjRCWA_TZH.T(nlam) = 100*Trn;
                 % caculate field in device 
-                if ObjRCWA.RecordField == 1
-                    if ObjRCWA.field.CoordXYZ ~= 0
-                        ObjRCWA.field.CaculatePointField
-                    elseif ObjRCWA.field.LayerZ ~= 0
-                        ObjRCWA.field.CaculateLayerField
-                    elseif sum(ObjRCWA.field.GridZ) ~= 0
-                        ObjRCWA.field.CaculateGridField;
+                if ObjRCWA_TZH.RecordField == 1
+                    if ObjRCWA_TZH.field.CoordXYZ ~= 0
+                        ObjRCWA_TZH.field.CaculatePointField
+                    elseif ObjRCWA_TZH.field.LayerZ ~= 0
+                        ObjRCWA_TZH.field.CaculateLayerField
+                    elseif sum(ObjRCWA_TZH.field.GridZ) ~= 0
+                        ObjRCWA_TZH.field.CaculateGridField;
                     end
                 end
-                if ObjRCWA.ShowProcess == 1
+                if ObjRCWA_TZH.ShowProcess == 1
                     waitbar(nlam/NLAM,h,'I am working, please don''t disturb me ...');
                     if getappdata(h,'canceling')
                         delete(h)
@@ -168,19 +169,19 @@ classdef RCWA < handle
                     end
                 end
             end
-            if ObjRCWA.RecordDifOrder == 1 
-                ObjRCWA.Ref_order = Ref_order_;
-                ObjRCWA.Trn_order = Trn_order_;
+            if ObjRCWA_TZH.RecordDifOrder == 1 
+                ObjRCWA_TZH.Ref_order = Ref_order_;
+                ObjRCWA_TZH.Trn_order = Trn_order_;
                 clear Ref_order_ Trn_order_
             end
-            if  ObjRCWA.ShowProcess == 1
+            if  ObjRCWA_TZH.ShowProcess == 1
                 delete(h)
             end
             
         end
         
         
-        function PlotRT(ObjRCWA)
+        function PlotRT(ObjRCWA_TZH)
             % Create figure
             figure1 = figure('Name','Reflection and Transmission','NumberTitle','off');
             
@@ -189,61 +190,61 @@ classdef RCWA < handle
             box(axes1,'on');
             hold(axes1,'all');
             
-            plot(ObjRCWA.source.wavelength/ObjRCWA.nanometers,ObjRCWA.R,'-r','LineWidth',2); hold on;
-            plot(ObjRCWA.source.wavelength/ObjRCWA.nanometers,ObjRCWA.T,'-b','LineWidth',2);
-            plot(ObjRCWA.source.wavelength/ObjRCWA.nanometers,100-(ObjRCWA.R+ObjRCWA.T),'-k','LineWidth',2); hold off;
+            plot(ObjRCWA_TZH.source.wavelength/ObjRCWA_TZH.nanometers,ObjRCWA_TZH.R,'-r','LineWidth',2); hold on;
+            plot(ObjRCWA_TZH.source.wavelength/ObjRCWA_TZH.nanometers,ObjRCWA_TZH.T,'-b','LineWidth',2);
+            plot(ObjRCWA_TZH.source.wavelength/ObjRCWA_TZH.nanometers,100-(ObjRCWA_TZH.R+ObjRCWA_TZH.T),'-k','LineWidth',2); hold off;
             legend('Reflectance', 'Transmittance', 'Conservation')
-            axis([min(ObjRCWA.source.wavelength)/ObjRCWA.nanometers max(ObjRCWA.source.wavelength)/ObjRCWA.nanometers 0 105]);
+            axis([min(ObjRCWA_TZH.source.wavelength)/ObjRCWA_TZH.nanometers max(ObjRCWA_TZH.source.wavelength)/ObjRCWA_TZH.nanometers 0 105]);
             xlabel('Wavelength (nm)','FontWeight','demi','FontSize',12);
             ylabel('%   ','Rotation',0,'FontWeight','demi','FontSize',12);
             title('SPECTRAL RESPONSE','FontWeight','bold','FontSize',14);
         end
         
-        function PlotR(ObjRCWA)
+        function PlotR(ObjRCWA_TZH)
             figure1 = figure('Name','Reflection','NumberTitle','off');
             % Create axes
             axes1 = axes('Parent',figure1,'FontWeight','demi','FontSize',14);
             box(axes1,'on');
             hold(axes1,'all');
             
-            plot(ObjRCWA.source.wavelength/ObjRCWA.nanometers,ObjRCWA.R,'-r','LineWidth',2);
+            plot(ObjRCWA_TZH.source.wavelength/ObjRCWA_TZH.nanometers,ObjRCWA_TZH.R,'-r','LineWidth',2);
             legend('Reflectance')
-            axis([min(ObjRCWA.source.wavelength)/ObjRCWA.nanometers max(ObjRCWA.source.wavelength)/ObjRCWA.nanometers 0 105]);
+            axis([min(ObjRCWA_TZH.source.wavelength)/ObjRCWA_TZH.nanometers max(ObjRCWA_TZH.source.wavelength)/ObjRCWA_TZH.nanometers 0 105]);
             xlabel('Wavelength (nm)','FontWeight','demi','FontSize',12);
             ylabel('%   ','Rotation',0,'FontWeight','demi','FontSize',12);
             title('Reflection','FontWeight','bold','FontSize',14);
         end
            
-        function PlotT(ObjRCWA)
+        function PlotT(ObjRCWA_TZH)
             figure1 = figure('Name','Transmission','NumberTitle','off');
             % Create axes
             axes1 = axes('Parent',figure1,'FontWeight','demi','FontSize',14);
             box(axes1,'on');
             hold(axes1,'all');
             
-            plot(ObjRCWA.source.wavelength/ObjRCWA.nanometers,ObjRCWA.T,'-b','LineWidth',2);
+            plot(ObjRCWA_TZH.source.wavelength/ObjRCWA_TZH.nanometers,ObjRCWA_TZH.T,'-b','LineWidth',2);
             legend('Transmittance')
-            axis([min(ObjRCWA.source.wavelength)/ObjRCWA.nanometers max(ObjRCWA.source.wavelength)/ObjRCWA.nanometers 0 105]);
+            axis([min(ObjRCWA_TZH.source.wavelength)/ObjRCWA_TZH.nanometers max(ObjRCWA_TZH.source.wavelength)/ObjRCWA_TZH.nanometers 0 105]);
             xlabel('Wavelength (nm)','FontWeight','demi','FontSize',12);
             ylabel('%   ','Rotation',0,'FontWeight','demi','FontSize',12);
             title('Transmission','FontWeight','bold','FontSize',14);
         end
         
-        function PlotA(ObjRCWA)
+        function PlotA(ObjRCWA_TZH)
             figure1 = figure('Name','Absorption','NumberTitle','off');
             % Create axes
             axes1 = axes('Parent',figure1,'FontWeight','demi','FontSize',14);
             box(axes1,'on');
             hold(axes1,'all');
-            plot(ObjRCWA.source.wavelength/ObjRCWA.nanometers,100-(ObjRCWA.R+ObjRCWA.T),'-k','LineWidth',2);
+            plot(ObjRCWA_TZH.source.wavelength/ObjRCWA_TZH.nanometers,100-(ObjRCWA_TZH.R+ObjRCWA_TZH.T),'-k','LineWidth',2);
             legend('Absorption')
-            axis([min(ObjRCWA.source.wavelength)/ObjRCWA.nanometers max(ObjRCWA.source.wavelength)/ObjRCWA.nanometers 0 105]);
+            axis([min(ObjRCWA_TZH.source.wavelength)/ObjRCWA_TZH.nanometers max(ObjRCWA_TZH.source.wavelength)/ObjRCWA_TZH.nanometers 0 105]);
             xlabel('Wavelength (nm)','FontWeight','demi','FontSize',12);
             ylabel('%   ','Rotation',0,'FontWeight','demi','FontSize',12);
             title('Absorption','FontWeight','bold','FontSize',14);
         end
         
-        function SaveData(ObjRCWA,name)
+        function SaveData(ObjRCWA_TZH,name)
             filename = strcat(name,'.mat');
             save(filename);
         end
