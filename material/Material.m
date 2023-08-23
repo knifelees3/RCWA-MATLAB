@@ -3,7 +3,7 @@ classdef Material < handle
     % Function inculde Plotn--plot the reflective index, Selectn--select
     % the reflective index which will be used.
     properties
-        MaterialName@char
+        MaterialName char
         n
         er
         ur
