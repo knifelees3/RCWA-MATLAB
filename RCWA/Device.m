@@ -12,7 +12,7 @@ classdef Device < handle
                                 % of point along y in real-space grid
         ilayer                  % number of the layer
         PQR                     % number of spatial harmonics along x and y (HAS TO BE ODD NUM)
-        Pattern@cell            % patterns on the substract
+        Pattern cell            % patterns on the substract
         URC                     % caculated convolution matrix of permittivity of the device
         ERC                     % caculated convolution matrix of permeability of the device
     end
